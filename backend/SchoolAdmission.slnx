@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="backend/SchoolAdmission.Api.csproj" />
+  <Project Path="SchoolAdmission.Api/SchoolAdmission.Api.csproj" />
   <Project Path="SchoolAdmission.Business/SchoolAdmission.Business.csproj" />
   <Project Path="SchoolAdmission.Data/SchoolAdmission.Data.csproj" />
   <Project Path="SchoolAdmission.Tests/SchoolAdmission.Tests.csproj" />

@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\backend\SchoolAdmission.Api.csproj" />
+    <ProjectReference Include="..\SchoolAdmission.Api\SchoolAdmission.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
