@@ -1,6 +1,6 @@
-﻿using SchoolAdmission.Api.Contracts;
+﻿using SchoolAdmission.Business.Contracts;
 
-namespace SchoolAdmission.Api.Services;
+namespace SchoolAdmission.Business.Services;
 
 public interface IHoldService
 {

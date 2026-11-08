@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SchoolAdmission.Api.Contracts;
+namespace SchoolAdmission.Api.Middleware;
 
-// One error format for every endpoint: { "error": "CODE", "message": "Human text" }
+// The HTTP error body for every endpoint: { "error": "CODE", "message": "Human text" }
 public record ErrorResponse(
     string Error,
     string Message,

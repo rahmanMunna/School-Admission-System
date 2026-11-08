@@ -1,6 +1,6 @@
-﻿namespace SchoolAdmission.Api.Options;
+﻿namespace SchoolAdmission.Business.Options;
 
-// Filled from the HOLD_DURATION_SECONDS environment variable (wired up in Step 3).
+// Filled from the HOLD_DURATION_SECONDS environment variable (wired up in Program.cs later).
 public sealed class HoldOptions
 {
     public const int DefaultSeconds = 600;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SchoolAdmission.Api.Contracts;
-using SchoolAdmission.Api.Identity;
-using SchoolAdmission.Api.Services;
+using SchoolAdmission.Api.Http;
+using SchoolAdmission.Business.Contracts;
+using SchoolAdmission.Business.Services;
 
 namespace SchoolAdmission.Api.Controllers;
 
@@ -31,7 +31,7 @@ public class ClassesController(IClassService classes, IHoldService holds) : Cont
     [HttpPost("{classId}/holds")]
     public async Task<IActionResult> CreateHold(string classId, CancellationToken ct)
     {
-        var studentId = StudentId.Require(Request);
+        var studentId = StudentIdHeader.Require(Request);
         var hold = await holds.CreateAsync(classId, studentId, ct);
         return Created($"/holds/{hold.HoldId}", hold);                  // 201
     }

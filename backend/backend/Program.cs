@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using SchoolAdmission.Api.Contracts;
-using SchoolAdmission.Api.Errors;
+using SchoolAdmission.Api.Middleware;
+using SchoolAdmission.Business.Errors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +8,7 @@ builder.Services
     .AddControllers()
     .ConfigureApiBehaviorOptions(options =>
     {
-        // Bad JSON or wrong types (e.g. "totalSeats": "abc") → OUR error format, not ASP.NET's default.
+        // Bad JSON / wrong types (e.g. "totalSeats": "abc") → OUR error format.
         options.InvalidModelStateResponseFactory = _ => new BadRequestObjectResult(
             new ErrorResponse(ErrorCodes.ValidationError,
                 "The request is not valid. Please check the fields and try again."));
@@ -23,7 +23,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseMiddleware<ErrorHandlingMiddleware>();   // catches all errors → { error, message }
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));

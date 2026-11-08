@@ -1,7 +1,6 @@
-﻿namespace SchoolAdmission.Api.Contracts;
+﻿namespace SchoolAdmission.Business.Contracts;
 
-// 201 response of POST /classes/{classId}/holds
-// ServerTime is an EXTRA field (allowed by the brief) so the UI countdown is accurate.
+// 201 response of POST /classes/{classId}/holds. ServerTime is an allowed EXTRA field.
 public record HoldCreatedResponse(
     Guid HoldId,
     Guid ClassId,
@@ -10,8 +9,7 @@ public record HoldCreatedResponse(
     DateTime ExpiresAt,
     DateTime ServerTime);
 
-// GET /holds/{holdId}. ClassName and ServerTime are extra fields.
-// No StudentId here: this endpoint has no header, so we don't leak it.
+// GET /holds/{holdId}. ClassName and ServerTime are extra. No StudentId (no header on this endpoint).
 public record HoldResponse(
     Guid HoldId,
     Guid ClassId,

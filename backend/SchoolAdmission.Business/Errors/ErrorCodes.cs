@@ -1,6 +1,6 @@
-﻿namespace SchoolAdmission.Api.Errors;
+﻿namespace SchoolAdmission.Business.Errors;
 
-// Machine-readable codes. The UI uses these to decide what to show.
+// Machine-readable codes returned in { "error": "..." }. The UI uses them.
 public static class ErrorCodes
 {
     public const string ValidationError = "VALIDATION_ERROR";
