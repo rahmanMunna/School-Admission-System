@@ -1,0 +1,38 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #f5f7fa;
+  color: #1d2433;
+}
+
+.container { max-width: 900px; margin: 0 auto; padding: 16px; }
+
+.header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.header h1 { font-size: 22px; margin: 8px 0; }
+.header nav { display: flex; gap: 16px; }
+.header a { color: #17589c; text-decoration: none; }
+.header a.active { font-weight: bold; text-decoration: underline; }
+
+.card { background: #fff; border: 1px solid #dde3ec; border-radius: 8px; padding: 16px; margin: 12px 0; }
+
+table { width: 100%; border-collapse: collapse; background: #fff; }
+th, td { text-align: left; padding: 8px; border-bottom: 1px solid #dde3ec; }
+th { background: #0b3a66; color: #fff; }
+
+button { padding: 6px 14px; border: 1px solid #17589c; background: #17589c; color: #fff; border-radius: 6px; cursor: pointer; }
+button.secondary { background: #fff; color: #17589c; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+input { padding: 6px 10px; border: 1px solid #b8c2d1; border-radius: 6px; font-size: 15px; }
+
+.error { background: #fff3f0; border: 1px solid #d9534f; color: #9b2c2c; padding: 10px; border-radius: 6px; margin: 10px 0; }
+.success { background: #effaf2; border: 1px solid #2e9d5b; color: #1f6b3d; padding: 10px; border-radius: 6px; margin: 10px 0; }
+.muted { color: #5b6678; font-size: 13px; }
+
+.badge { padding: 2px 8px; border-radius: 4px; font-size: 13px; font-weight: bold; }
+.badge.HELD { background: #fff4d6; color: #8a6100; }
+.badge.CONFIRMED { background: #dff5e7; color: #1f6b3d; }
+.badge.EXPIRED { background: #fde2e2; color: #9b2c2c; }
+.badge.CANCELLED { background: #e9ecf1; color: #4a5568; }
