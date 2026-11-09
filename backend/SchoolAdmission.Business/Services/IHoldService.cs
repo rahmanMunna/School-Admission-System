@@ -9,4 +9,7 @@ public interface IHoldService
     Task<ConfirmResponse> ConfirmAsync(string holdId, string studentId, CancellationToken ct);
     Task CancelAsync(string holdId, string studentId, CancellationToken ct);
     Task<IReadOnlyList<MyHoldResponse>> ListMineAsync(string studentId, CancellationToken ct);
+
+    // Marks all time-expired HELD holds as EXPIRED. Returns how many changed.
+    Task<int> ExpireStaleHoldsAsync(CancellationToken ct);
 }

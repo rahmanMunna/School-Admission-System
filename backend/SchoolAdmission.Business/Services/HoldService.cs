@@ -142,6 +142,10 @@ public class HoldService(
 
     // ---------- Helpers ----------
 
+    // ---------- Background sweeper ----------
+    public Task<int> ExpireStaleHoldsAsync(CancellationToken ct) =>
+        holds.ExpireAllStaleAsync(clock.UtcNowSeconds(), ct);
+
     // A HELD hold counts as EXPIRED the moment its time is up, even before the DB row is updated.
     private static HoldStatus StatusAt(Hold hold, DateTime now) =>
         hold.Status == HoldStatus.HELD && hold.ExpiresAt <= now ? HoldStatus.EXPIRED : hold.Status;

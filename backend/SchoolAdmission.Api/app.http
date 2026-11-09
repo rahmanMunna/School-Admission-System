@@ -1,9 +1,9 @@
 # For more info on HTTP files go to https://aka.ms/vs/httpfile
 @api = http://localhost:5080
-@student = 20152691234567890
-@student2 = 20152691234567891
+@student = 20152691234567892
+@student2 = 20152691234567893
 @classId = 16d9bec8-53ed-40d8-a2cb-2abbc08a9929
-@holdId = b21266a5-c575-4f6b-a670-00cb02d5e7f4
+@holdId = e19c26d9-6c6a-4293-b7f6-4c5da8737e8e
 
 ### 1. Create a class (2 seats)
 POST {{api}}/classes

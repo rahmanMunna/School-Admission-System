@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SchoolAdmission.Api.Background;
 using SchoolAdmission.Api.Middleware;
 using SchoolAdmission.Business.Errors;
 using SchoolAdmission.Business.Options;
@@ -35,6 +36,8 @@ builder.Services
             new ErrorResponse(ErrorCodes.ValidationError,
                 "The request is not valid. Please check the fields and try again."));
     });
+
+builder.Services.AddHostedService<HoldExpiryWorker>();
 
 builder.Services.AddOpenApi();
 

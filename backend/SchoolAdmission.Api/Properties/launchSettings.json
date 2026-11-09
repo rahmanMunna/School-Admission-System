@@ -33,7 +33,7 @@
       "applicationUrl": "http://localhost:5080",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "HOLD_DURATION_SECONDS": "60"
+        "HOLD_DURATION_SECONDS": "30"
       }
     }
   }
