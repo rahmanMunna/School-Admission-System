@@ -6,14 +6,26 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-admission}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admission}
     ports:
-      - "${DB_PORT:-5433}:5432"          # host 5433 → container 5432 (for Visual Studio / DB tools)
+      - "${DB_PORT:-5433}:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data  # named volume → data survives "docker compose down"
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 3s
       timeout: 3s
       retries: 30
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    environment:
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=${POSTGRES_DB:-admission};Username=${POSTGRES_USER:-admission};Password=${POSTGRES_PASSWORD:-admission}"
+      HOLD_DURATION_SECONDS: ${HOLD_DURATION_SECONDS:-600}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:
