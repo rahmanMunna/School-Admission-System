@@ -18,18 +18,16 @@ public class ClassRepository(AdmissionDbContext db) : IClassRepository
     }
 
     public async Task<IReadOnlyList<ClassSeatCounts>> ListWithSeatCountsAsync(DateTime now, CancellationToken ct) =>
-        await SeatCountsQuery(now)
-            .OrderBy(c => c.Name)
+        await WithSeatCounts(db.Classes.OrderBy(c => c.Name), now)      // sort the TABLE first
             .ToListAsync(ct);
 
     public Task<ClassSeatCounts?> GetWithSeatCountsAsync(Guid id, DateTime now, CancellationToken ct) =>
-        SeatCountsQuery(now)
-            .Where(c => c.Id == id)
+        WithSeatCounts(db.Classes.Where(c => c.Id == id), now)          // filter the TABLE first
             .FirstOrDefaultAsync(ct);
 
-    // One query: each class + COUNT of active HELD + COUNT of CONFIRMED
-    private IQueryable<ClassSeatCounts> SeatCountsQuery(DateTime now) =>
-        db.Classes.AsNoTracking().Select(c => new ClassSeatCounts(
+    // Last step: turn each class row into ClassSeatCounts (with live counts from the holds table).
+    private static IQueryable<ClassSeatCounts> WithSeatCounts(IQueryable<SchoolClass> classes, DateTime now) =>
+        classes.AsNoTracking().Select(c => new ClassSeatCounts(
             c.Id,
             c.Name,
             c.TotalSeats,

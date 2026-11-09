@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using SchoolAdmission.Api.Middleware;
 using SchoolAdmission.Business.Errors;
 using SchoolAdmission.Business.Options;
+using SchoolAdmission.Business.Services;
 using SchoolAdmission.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,8 @@ builder.Services.AddDataAccess(connectionString);
 builder.Services.Configure<HoldOptions>(o => o.HoldDurationSeconds = holdSeconds);
 builder.Services.AddSingleton(TimeProvider.System);   // injectable clock (tests can fake it)
 // Service implementations (ClassService, HoldService) get registered in the services step.
+builder.Services.AddScoped<IClassService, ClassService>();
+builder.Services.AddScoped<IHoldService, HoldService>();
 
 // ---------- Tier 1: Presentation ----------
 builder.Services

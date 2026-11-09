@@ -1,0 +1,46 @@
+# For more info on HTTP files go to https://aka.ms/vs/httpfile
+@api = http://localhost:5080
+@student = 20152691234567890
+@student2 = 20152691234567891
+@classId = 16d9bec8-53ed-40d8-a2cb-2abbc08a9929
+@holdId = b21266a5-c575-4f6b-a670-00cb02d5e7f4
+
+### 1. Create a class (2 seats)
+POST {{api}}/classes
+Content-Type: application/json
+
+{ "name": "Class 6 - Morning Shift", "totalSeats": 2 }
+
+### 2. List classes
+GET {{api}}/classes
+
+### 3. Apply (student 1)
+POST {{api}}/classes/{{classId}}/holds
+X-Student-Id: {{student}}
+
+### 4. Apply again (student 1) → expect 409 ALREADY_APPLIED
+POST {{api}}/classes/{{classId}}/holds
+X-Student-Id: {{student}}
+
+### 5. Get the application
+GET {{api}}/holds/{{holdId}}
+
+### 6. Pay → expect 200 CONFIRMED (send twice: still 200)
+POST {{api}}/holds/{{holdId}}/confirm
+X-Student-Id: {{student}}
+
+### 7. Pay as another student → expect 403
+POST {{api}}/holds/{{holdId}}/confirm
+X-Student-Id: {{student2}}
+
+### 8. Cancel → expect 409 CANNOT_CANCEL_CONFIRMED (after paying)
+DELETE {{api}}/holds/{{holdId}}
+X-Student-Id: {{student}}
+
+### 9. My applications
+GET {{api}}/me/holds
+X-Student-Id: {{student}}
+
+### 10. Bad student ID → expect 400
+POST {{api}}/classes/{{classId}}/holds
+X-Student-Id: 123
