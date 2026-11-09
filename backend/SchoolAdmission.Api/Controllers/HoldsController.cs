@@ -6,23 +6,41 @@ namespace SchoolAdmission.Api.Controllers;
 
 [ApiController]
 [Route("holds")]
-public class HoldsController(IHoldService holds) : ControllerBase
+public class HoldsController : ControllerBase
 {
-    // 5. GET /holds/{holdId}  (header optional)
+    private readonly IHoldService _holds;
+    public HoldsController(IHoldService holds)
+    {
+        _holds = holds;
+    }
+
     [HttpGet("{holdId}")]
-    public async Task<IActionResult> Get(string holdId, CancellationToken ct) =>
-        Ok(await holds.GetAsync(holdId, StudentIdHeader.Optional(Request), ct));
+    public async Task<IActionResult> Get(string holdId, CancellationToken ct)
+    {
+        var studentId = StudentIdHeader.Optional(Request);
 
-    // 6. POST /holds/{holdId}/confirm  (header required)
+        var result = await _holds.GetAsync(holdId, studentId, ct);
+
+        return Ok(result);
+    }
+
     [HttpPost("{holdId}/confirm")]
-    public async Task<IActionResult> Confirm(string holdId, CancellationToken ct) =>
-        Ok(await holds.ConfirmAsync(holdId, StudentIdHeader.Require(Request), ct));
+    public async Task<IActionResult> Confirm(string holdId, CancellationToken ct)
+    {
+        var studentId = StudentIdHeader.Require(Request);
 
-    // 7. DELETE /holds/{holdId}  (header required)
+        var result = await _holds.ConfirmAsync(holdId, studentId, ct);
+
+        return Ok(result);
+    }
+
     [HttpDelete("{holdId}")]
     public async Task<IActionResult> Cancel(string holdId, CancellationToken ct)
     {
-        await holds.CancelAsync(holdId, StudentIdHeader.Require(Request), ct);
-        return NoContent();                                              // 204
+        var studentId = StudentIdHeader.Require(Request);
+
+        await _holds.CancelAsync(holdId, studentId, ct);
+
+        return NoContent(); 
     }
 }

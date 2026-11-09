@@ -7,32 +7,52 @@ namespace SchoolAdmission.Api.Controllers;
 
 [ApiController]
 [Route("classes")]
-public class ClassesController(IClassService classes, IHoldService holds) : ControllerBase
+public class ClassesController : ControllerBase
 {
-    // 1. POST /classes  (admin)
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateClassRequest request, CancellationToken ct)
+    private readonly IClassService _classes;
+    private readonly IHoldService _holds;
+
+    public ClassesController(IClassService classes, IHoldService holds)
     {
-        var created = await classes.CreateAsync(request, ct);
-        return Created($"/classes/{created.Id}", created);              // 201
+        _classes = classes;
+        _holds = holds;
     }
 
-    // 2. GET /classes
+    [HttpPost]
+    public async Task<IActionResult> Create(
+        [FromBody] CreateClassRequest request,
+        CancellationToken ct)
+    {
+        var created = await _classes.CreateAsync(request, ct);
+
+        return Created($"/classes/{created.Id}", created); 
+    }
+
     [HttpGet]
-    public async Task<IActionResult> List(CancellationToken ct) =>
-        Ok(await classes.ListAsync(ct));                                 // 200
+    public async Task<IActionResult> List(CancellationToken ct)
+    {
+        var result = await _classes.ListAsync(ct);
 
-    // 3. GET /classes/{classId}
+        return Ok(result); 
+    }
+
     [HttpGet("{classId}")]
-    public async Task<IActionResult> Get(string classId, CancellationToken ct) =>
-        Ok(await classes.GetAsync(classId, ct));                         // 200
+    public async Task<IActionResult> Get(string classId, CancellationToken ct)
+    {
+        var result = await _classes.GetAsync(classId, ct);
 
-    // 4. POST /classes/{classId}/holds  (guardian, header required)
+        return Ok(result); 
+    }
+
     [HttpPost("{classId}/holds")]
-    public async Task<IActionResult> CreateHold(string classId, CancellationToken ct)
+    public async Task<IActionResult> CreateHold(
+        string classId,
+        CancellationToken ct)
     {
         var studentId = StudentIdHeader.Require(Request);
-        var hold = await holds.CreateAsync(classId, studentId, ct);
-        return Created($"/holds/{hold.HoldId}", hold);                  // 201
+
+        var hold = await _holds.CreateAsync(classId, studentId, ct);
+
+        return Created($"/holds/{hold.HoldId}", hold); // HTTP 201
     }
 }

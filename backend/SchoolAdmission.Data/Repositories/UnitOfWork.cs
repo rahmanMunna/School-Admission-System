@@ -2,18 +2,52 @@
 
 namespace SchoolAdmission.Data.Repositories;
 
-// All repositories in one request share the same scoped AdmissionDbContext,
-// so a transaction started here covers every repository call in between.
-public class UnitOfWork(AdmissionDbContext db) : IUnitOfWork
+public class UnitOfWork : IUnitOfWork
 {
-    public async Task<ITransactionScope> BeginTransactionAsync(CancellationToken ct) =>
-        new TransactionScope(await db.Database.BeginTransactionAsync(ct));
+    private readonly AdmissionDbContext _db;
 
-    public Task SaveChangesAsync(CancellationToken ct) => db.SaveChangesAsync(ct);
-
-    private sealed class TransactionScope(IDbContextTransaction tx) : ITransactionScope
+    // Constructor
+    public UnitOfWork(AdmissionDbContext db)
     {
-        public Task CommitAsync(CancellationToken ct) => tx.CommitAsync(ct);
-        public ValueTask DisposeAsync() => tx.DisposeAsync();   // rolls back if not committed
+        _db = db;
+    }
+
+    // Begin database transaction
+    public async Task<ITransactionScope> BeginTransactionAsync(
+        CancellationToken ct)
+    {
+        var transaction = await _db.Database.BeginTransactionAsync(ct);
+
+        return new TransactionScope(transaction);
+    }
+
+    // Save changes to the database
+    public async Task SaveChangesAsync(CancellationToken ct)
+    {
+        await _db.SaveChangesAsync(ct);
+    }
+
+    // Inner class to manage transaction
+    private sealed class TransactionScope : ITransactionScope
+    {
+        private readonly IDbContextTransaction _tx;
+
+        // Constructor
+        public TransactionScope(IDbContextTransaction tx)
+        {
+            _tx = tx;
+        }
+
+        // Commit transaction
+        public async Task CommitAsync(CancellationToken ct)
+        {
+            await _tx.CommitAsync(ct);
+        }
+
+        // Dispose transaction
+        public async ValueTask DisposeAsync()
+        {
+            await _tx.DisposeAsync();
+        }
     }
 }

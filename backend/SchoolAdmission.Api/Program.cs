@@ -26,6 +26,7 @@ builder.Services.AddSingleton(TimeProvider.System);   // injectable clock (tests
 // Service implementations (ClassService, HoldService) get registered in the services step.
 builder.Services.AddScoped<IClassService, ClassService>();
 builder.Services.AddScoped<IHoldService, HoldService>();
+builder.Services.AddHostedService<HoldExpiryWorker>();
 
 // ---------- Tier 1: Presentation ----------
 builder.Services
@@ -37,7 +38,7 @@ builder.Services
                 "The request is not valid. Please check the fields and try again."));
     });
 
-builder.Services.AddHostedService<HoldExpiryWorker>();
+
 
 builder.Services.AddOpenApi();
 
