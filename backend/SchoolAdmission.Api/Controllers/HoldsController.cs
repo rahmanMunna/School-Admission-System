@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SchoolAdmission.Api.Http;
+using SchoolAdmission.Business.Contracts;
 using SchoolAdmission.Business.Services;
+using SchoolAdmission.Business.Validation;
 
 namespace SchoolAdmission.Api.Controllers;
 
@@ -8,39 +9,39 @@ namespace SchoolAdmission.Api.Controllers;
 [Route("holds")]
 public class HoldsController : ControllerBase
 {
-    private readonly IHoldService _holds;
-    public HoldsController(IHoldService holds)
+    private readonly IHoldService _holdService;
+
+    public HoldsController(IHoldService holdService)
     {
-        _holds = holds;
+        _holdService = holdService;
     }
 
     [HttpGet("{holdId}")]
-    public async Task<IActionResult> Get(string holdId, CancellationToken ct)
+    public async Task<IActionResult> Get(string holdId,[FromHeader(Name = "X-Student-Id")] string? studentId,CancellationToken ct)
     {
-        var studentId = StudentIdHeader.Optional(Request);
+        if (studentId != null)
+        {
+            studentId = StudentIdRules.Validate(studentId);
+        }
 
-        var result = await _holds.GetAsync(holdId, studentId, ct);
-
-        return Ok(result);
+        HoldResponse hold = await _holdService.GetAsync(holdId, studentId, ct);
+        return Ok(hold);                                             
     }
 
+  
     [HttpPost("{holdId}/confirm")]
-    public async Task<IActionResult> Confirm(string holdId, CancellationToken ct)
+    public async Task<IActionResult> Confirm(string holdId,[FromHeader(Name = "X-Student-Id")] string? studentId,CancellationToken ct)
     {
-        var studentId = StudentIdHeader.Require(Request);
-
-        var result = await _holds.ConfirmAsync(holdId, studentId, ct);
-
-        return Ok(result);
+        string validStudentId = StudentIdRules.Validate(studentId);
+        ConfirmResponse result = await _holdService.ConfirmAsync(holdId, validStudentId, ct);
+        return Ok(result);                                           
     }
 
     [HttpDelete("{holdId}")]
-    public async Task<IActionResult> Cancel(string holdId, CancellationToken ct)
+    public async Task<IActionResult> Cancel(string holdId,[FromHeader(Name = "X-Student-Id")] string? studentId,CancellationToken ct)
     {
-        var studentId = StudentIdHeader.Require(Request);
-
-        await _holds.CancelAsync(holdId, studentId, ct);
-
-        return NoContent(); 
+        string validStudentId = StudentIdRules.Validate(studentId);
+        await _holdService.CancelAsync(holdId, validStudentId, ct);
+        return NoContent();                                          
     }
 }

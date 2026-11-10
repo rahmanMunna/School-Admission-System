@@ -15,12 +15,14 @@ public class HoldService : IHoldService
     private readonly TimeProvider _clock;
     private readonly HoldOptions _options;
 
-    public HoldService(
-        IClassRepository classRepository,
-        IHoldRepository holdRepository,
-        IUnitOfWork unitOfWork,
-        TimeProvider clock,
-        IOptions<HoldOptions> options)
+    public HoldService
+        (
+            IClassRepository classRepository,
+            IHoldRepository holdRepository,
+            IUnitOfWork unitOfWork,
+            TimeProvider clock,
+            IOptions<HoldOptions> options
+        )
     {
         _classRepository = classRepository;
         _holdRepository = holdRepository;

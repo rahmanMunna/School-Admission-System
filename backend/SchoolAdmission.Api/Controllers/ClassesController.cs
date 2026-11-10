@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SchoolAdmission.Api.Http;
 using SchoolAdmission.Business.Contracts;
 using SchoolAdmission.Business.Services;
+using SchoolAdmission.Business.Validation;
 
 namespace SchoolAdmission.Api.Controllers;
 
@@ -9,50 +9,41 @@ namespace SchoolAdmission.Api.Controllers;
 [Route("classes")]
 public class ClassesController : ControllerBase
 {
-    private readonly IClassService _classes;
-    private readonly IHoldService _holds;
+    private readonly IClassService _classService;
+    private readonly IHoldService _holdService;
 
-    public ClassesController(IClassService classes, IHoldService holds)
+    public ClassesController(IClassService classService, IHoldService holdService)
     {
-        _classes = classes;
-        _holds = holds;
+        _classService = classService;
+        _holdService = holdService;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(
-        [FromBody] CreateClassRequest request,
-        CancellationToken ct)
+    public async Task<IActionResult> Create([FromBody] CreateClassRequest request, CancellationToken ct)
     {
-        var created = await _classes.CreateAsync(request, ct);
-
-        return Created($"/classes/{created.Id}", created); 
+        ClassCreatedResponse created = await _classService.CreateAsync(request, ct);
+        return Created($"/classes/{created.Id}", created);       
     }
 
     [HttpGet]
     public async Task<IActionResult> List(CancellationToken ct)
     {
-        var result = await _classes.ListAsync(ct);
-
-        return Ok(result); 
+        IReadOnlyList<ClassResponse> classes = await _classService.ListAsync(ct);
+        return Ok(classes);                                           
     }
 
     [HttpGet("{classId}")]
     public async Task<IActionResult> Get(string classId, CancellationToken ct)
     {
-        var result = await _classes.GetAsync(classId, ct);
-
-        return Ok(result); 
+        ClassResponse schoolClass = await _classService.GetAsync(classId, ct);
+        return Ok(schoolClass);                                     
     }
 
     [HttpPost("{classId}/holds")]
-    public async Task<IActionResult> CreateHold(
-        string classId,
-        CancellationToken ct)
+    public async Task<IActionResult> CreateHold(string classId,[FromHeader(Name = "X-Student-Id")] string? studentId,CancellationToken ct)
     {
-        var studentId = StudentIdHeader.Require(Request);
-
-        var hold = await _holds.CreateAsync(classId, studentId, ct);
-
-        return Created($"/holds/{hold.HoldId}", hold); // HTTP 201
+        string validStudentId = StudentIdRules.Validate(studentId);  
+        HoldCreatedResponse hold = await _holdService.CreateAsync(classId, validStudentId, ct);
+        return Created($"/holds/{hold.HoldId}", hold);             
     }
 }

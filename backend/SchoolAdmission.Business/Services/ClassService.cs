@@ -11,39 +11,27 @@ public class ClassService : IClassService
     private readonly IUnitOfWork _unitOfWork;
     private readonly TimeProvider _clock;
 
-    public ClassService(
-        IClassRepository classes,
-        IUnitOfWork unitOfWork,
-        TimeProvider clock)
+    public ClassService(IClassRepository classes,IUnitOfWork unitOfWork,TimeProvider clock)
     {
         _classes = classes;
         _unitOfWork = unitOfWork;
         _clock = clock;
     }
 
-    public async Task<ClassCreatedResponse> CreateAsync(
-        CreateClassRequest request,
-        CancellationToken ct)
+    public async Task<ClassCreatedResponse> CreateAsync(CreateClassRequest request,CancellationToken ct)
     {
-        // Validate class name
         var name = request.Name?.Trim();
 
         if (string.IsNullOrEmpty(name) || name.Length > 100)
         {
-            throw AppException.Validation(
-                ErrorCodes.InvalidName,
-                "Class name is required (maximum 100 characters).");
+            throw AppException.Validation(ErrorCodes.InvalidName,"Class name is required (maximum 100 characters).");
         }
 
-        // Validate total seats
         if (request.TotalSeats is null or < 1 or > 10000)
         {
-            throw AppException.Validation(
-                ErrorCodes.InvalidTotalSeats,
-                "Total seats must be a whole number between 1 and 10000.");
+            throw AppException.Validation(ErrorCodes.InvalidTotalSeats,"Total seats must be a whole number between 1 and 10000.");
         }
 
-        // Create new class entity
         var schoolClass = new SchoolClass
         {
             Id = Guid.NewGuid(),
@@ -52,16 +40,16 @@ public class ClassService : IClassService
             CreatedAt = _clock.UtcNowSeconds()
         };
 
-        // Save class to database
         _classes.Add(schoolClass);
 
         await _unitOfWork.SaveChangesAsync(ct);
 
-        // Return created class information
-        var response = new ClassCreatedResponse(
-            schoolClass.Id,
-            schoolClass.Name,
-            schoolClass.TotalSeats);
+        var response = new ClassCreatedResponse
+            (
+                schoolClass.Id,
+                schoolClass.Name,
+                schoolClass.TotalSeats
+            );
 
         return response;
     }

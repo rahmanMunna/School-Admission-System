@@ -1,39 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SchoolAdmission.Api.Http;
+using SchoolAdmission.Business.Contracts;
 using SchoolAdmission.Business.Services;
+using SchoolAdmission.Business.Validation;
 
 namespace SchoolAdmission.Api.Controllers;
-
-//[ApiController]
-//[Route("me")]
-//public class MeController(IHoldService holds) : ControllerBase
-//{
-//    [HttpGet("holds")]
-//    public async Task<IActionResult> MyHolds(CancellationToken ct) =>
-//        Ok(await holds.ListMineAsync(StudentIdHeader.Require(Request), ct));
-//}
-
 
 [ApiController]
 [Route("me")]
 public class MeController : ControllerBase
 {
-    private readonly IHoldService _holds;
+    private readonly IHoldService _holdService;
 
-    // Constructor
-    public MeController(IHoldService holds)
+    public MeController(IHoldService holdService)
     {
-        _holds = holds;
+        _holdService = holdService;
     }
 
-    // GET: /me/holds
     [HttpGet("holds")]
-    public async Task<IActionResult> MyHolds(CancellationToken ct)
+    public async Task<IActionResult> MyHolds([FromHeader(Name = "X-Student-Id")] string? studentId,CancellationToken ct)
     {
-        var studentId = StudentIdHeader.Require(Request);
-
-        var result = await _holds.ListMineAsync(studentId, ct);
-
-        return Ok(result);
+        string validStudentId = StudentIdRules.Validate(studentId);
+        IReadOnlyList<MyHoldResponse> holds = await _holdService.ListMineAsync(validStudentId, ct);
+        return Ok(holds);                                            
     }
 }

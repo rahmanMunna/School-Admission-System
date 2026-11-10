@@ -13,8 +13,7 @@ public class UnitOfWork : IUnitOfWork
     }
 
     // Begin database transaction
-    public async Task<ITransactionScope> BeginTransactionAsync(
-        CancellationToken ct)
+    public async Task<ITransactionScope> BeginTransactionAsync(CancellationToken ct)
     {
         var transaction = await _db.Database.BeginTransactionAsync(ct);
 
