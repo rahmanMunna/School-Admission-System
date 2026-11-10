@@ -1,12 +1,27 @@
-import { NavLink, Route, Routes } from "react-router-dom";
-
-// Placeholders. We build the real pages in the next steps.
-function ClassListPage() { return <h2>Classes</h2>; }
-function MyHoldsPage()   { return <h2>My applications</h2>; }
-function HoldPage()      { return <h2>Application</h2>; }
-function AdminPage()     { return <h2>School admin</h2>; }
+import { useState } from "react";
+import { NavLink, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import StudentBar from "./components/StudentBar";
+import { clearStudentId, loadStudentId, saveStudentId } from "./studentId";
+import ClassListPage from "./pages/ClassListPage";
+import HoldPage from "./pages/HoldPage";
+import MyHoldsPage from "./pages/MyHoldsPage";
+import AdminPage from "./pages/AdminPage";
 
 export default function App() {
+  // Read the saved ID once when the app starts (survives refresh / reopening the browser)
+  const [studentId, setStudentId] = useState(loadStudentId);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isAdminPage = location.pathname.startsWith("/admin");
+
+  function changeStudent(id) {
+    if (id) saveStudentId(id);
+    else clearStudentId();
+    setStudentId(id);
+    navigate("/");                     // go back to the class list after switching
+  }
+
   return (
     <div className="container">
       <header className="header">
@@ -18,11 +33,14 @@ export default function App() {
         </nav>
       </header>
 
+      {/* The admin area doesn't need a student ID */}
+      {!isAdminPage && <StudentBar studentId={studentId} onChange={changeStudent} />}
+
       <main>
         <Routes>
-          <Route path="/" element={<ClassListPage />} />
-          <Route path="/my" element={<MyHoldsPage />} />
-          <Route path="/holds/:holdId" element={<HoldPage />} />
+          <Route path="/" element={<ClassListPage studentId={studentId} />} />
+          <Route path="/my" element={<MyHoldsPage studentId={studentId} />} />
+          <Route path="/holds/:holdId" element={<HoldPage studentId={studentId} />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<p>Page not found.</p>} />
         </Routes>

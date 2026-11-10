@@ -36,3 +36,7 @@ input { padding: 6px 10px; border: 1px solid #b8c2d1; border-radius: 6px; font-s
 .badge.CONFIRMED { background: #dff5e7; color: #1f6b3d; }
 .badge.EXPIRED { background: #fde2e2; color: #9b2c2c; }
 .badge.CANCELLED { background: #e9ecf1; color: #4a5568; }
+
+.student-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.student-bar input { width: 240px; }
+.student-bar .error { width: 100%; margin: 0; }
