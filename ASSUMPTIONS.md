@@ -16,3 +16,4 @@
 | 12 | Pay = instant success; no amount is stored | Brief says to assume payment succeeds |
 | 13 | Duplicate class names allowed; name 1–100 characters; seats 1–10,000 | Re-running tests must not fail; limits block bad input |
 | 14 | Used Docker Volume | For data persistent. If remove or crash the container, again spin up a container , and data remains same |
+| 15 | The student ID is saved in the browser's `localStorage` after it is entered once | The guardian doesn't retype it; after a refresh or reopening the browser, their applications load again. Only the ID is stored; applications always come from the server |

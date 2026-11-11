@@ -2,21 +2,21 @@
 @api = http://localhost:5080
 @student = 20152691234567892
 @student2 = 20152691234567893
-@classId = 16d9bec8-53ed-40d8-a2cb-2abbc08a9929
-@holdId = e19c26d9-6c6a-4293-b7f6-4c5da8737e8e
+@classId = 94dd8f92-855f-42c9-9eb0-e1f0d65b99a6
+@holdId = f2e04865-d9bb-4742-b7ce-54643cf56ba6
 
 ### 1. Create a class (2 seats)
 POST {{api}}/classes
 Content-Type: application/json
 
-{ "name": "Class 6 - Morning Shift", "totalSeats": 2 }
+{ "name": "Class 10 - Day Shift", "totalSeats": 1 }
 
 ### 2. List classes
 GET {{api}}/classes
 
 ### 3. Apply (student 1)
 POST {{api}}/classes/{{classId}}/holds
-X-Student-Id: {{student}}
+X-Student-Id: {{student2}}
 
 ### 4. Apply again (student 1) → expect 409 ALREADY_APPLIED
 POST {{api}}/classes/{{classId}}/holds

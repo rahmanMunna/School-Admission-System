@@ -86,8 +86,7 @@ export default function ClassListPage({ studentId }) {
           </tbody>
         </table>
       )}
-
-      <p className="muted">Seat counts update automatically every 3 seconds.</p>
+     
     </div>
   );
 }
