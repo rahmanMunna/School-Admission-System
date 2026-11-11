@@ -1,43 +1,37 @@
 # AI Usage
 
-## Tool
+**Tool:** Claude
 
-**Claude** (Anthropic), in chat.
+## Where I used AI
 
-## How I used it
+| Part | How AI helped | What I did |
+|---|---|---|
+| Design decisions | Discussed options when I was unsure: row lock vs C# lock vs SERIALIZABLE, background service vs scheduler, polling vs WebSockets | Chose the approach and wrote the assumptions |
+| Backend code | Generated the initial code for each layer |  Modified every layer: rewrote services, repositories and controllers and replaced a header-helper class with `[FromHeader]`, changed `ClassSeatCounts` to a class, fixed the EF query; tested every endpoint manually (class full, duplicate apply, pay twice, wrong student, cancel, expiry) |
+| Frontend pages | First drafts of page structure and styling | Tested every flow in the browser, simplified config (removed extra config files) |
+| Automated tests | First drafts of backend (xUnit) and frontend (Vitest) tests | Ran them, found and fixed the failures below |
+| Docker | First drafts of Dockerfiles and compose | Fixed local port conflict (8080 taken) with `API_PORT`, kept 8080 as default |
 
-I used AI as a pair programmer. I discussed design decisions with it when I was unsure. I got first drafts of code from it, which I then ran, tested, debugged and simplified myself. I also asked it to explain things until I could defend each part on my own.
+## Where AI was wrong → how I caught it → how I solved it
 
-**Design questions I discussed with it:**
+1. **Concurrency test failed in Docker**
+   - Wrong: test setup used `Maximum Pool Size=200`; 200 parallel requests exceeded PostgreSQL's 100 connections → many 500s.
+   - Caught: Docker test run showed 89 conflicts instead of 190 (the 10-seat limit still held).
+   - Solved: `Maximum Pool Size=40` for tests and backend, so extra requests wait instead of failing.
 
-- Background service vs a scheduler (Hangfire/Quartz) for expiring holds. I chose a .NET `BackgroundService`, because the job runs every 5 seconds, is idempotent, and isn't needed for correctness.
-- How to stop overbooking: a C# `lock` vs SERIALIZABLE isolation vs a row lock. I chose `SELECT … FOR UPDATE` in a transaction, because it works across several backend instances.
-- Polling vs WebSockets for live seat counts. I chose polling, because the brief asks for "every few seconds".
-- 3-tier structure with repositories and a Unit of Work, whether a separate status table was needed (it wasn't), and nginx vs `serve` for the frontend.
+2. **`GET /classes` crashed: "LINQ expression could not be translated"**
+   - Wrong: repository sorted/filtered *after* projecting into `ClassSeatCounts`.
+   - Caught: testing the endpoint.
+   - Solved: sort and filter the `classes` table first, project last.
 
-**Code:** first drafts of the backend layers, the EF Core configuration, the services, the React pages, the Dockerfiles, and the backend and frontend automated tests came from AI. I built and ran each part step by step, and changed it where it didn't work or wasn't clear to me.
+3. **Frontend test found two "Continue" buttons**
+   - Wrong: Vitest setup had no React Testing Library `cleanup()`, so earlier tests' components stayed on the page.
+   - Caught: failing `StudentBar` test.
+   - Solved: `afterEach(cleanup)` in `setupTests.js`.
 
-## What I did myself
+## How I verified
 
-- Ran everything in Visual Studio, VS Code and Docker, and tested every endpoint by hand: class full, duplicate apply, pay twice, wrong student, cancel, expiry without reload, refresh, server down.
-- Solved environment problems on my machine. Port 8080 was taken by a Windows service, so I override the host port locally with `API_PORT` while the project default stays 8080. I also fixed a nested project folder.
-- Refactored the code into a style I can explain. Services, repositories and controllers use classic constructors and plain `if`/`foreach`. I replaced a header-helper class with `[FromHeader]`, and removed extra frontend config files.
-- Decided the assumptions in `ASSUMPTIONS.md`.
+- 8 backend tests (incl. 2 concurrency) and 10 frontend tests pass.
+- Manual checks: class full, duplicate apply, pay twice, wrong student, cancel, expiry without reload, server down, data after restart.
 
-## Where the AI was wrong, and how I caught it
 
-**1. The concurrency test failed in Docker.**
-My concurrency test sends 200 applications at once to a 10-seat class. In Docker, the 10-seat limit held, but only 89 requests got 409 instead of 190, because many returned 500. The test setup allowed a pool of 200 connections, but PostgreSQL accepts only 100 by default. I set `Maximum Pool Size=40` for the tests and the backend, so extra requests now wait for a free connection instead of failing. This is also why two backend instances stay under PostgreSQL's limit.
-
-**2. `GET /classes` crashed with "LINQ expression could not be translated".**
-The repository projected classes into a `ClassSeatCounts` object first, then sorted and filtered that object. EF Core can't turn that into SQL. I caught it while testing the endpoint, and changed the query to sort and filter the `classes` table first and build `ClassSeatCounts` last.
-
-**3. A frontend test found two "Continue" buttons.**
-The Vitest setup was missing React Testing Library's `cleanup()`. Vitest doesn't expose `afterEach` globally by default, so each test's component stayed on the page and the next test saw two forms. I added `afterEach(cleanup)` in `setupTests.js`.
-
-## How I verified the work
-
-- Backend: 8 automated tests, including 2 concurrency tests, run in Docker as an evaluator would.
-- Frontend: 10 Vitest tests (student ID rules, the student ID bar, API error handling).
-- I removed `FOR UPDATE` temporarily to confirm the concurrency test fails without it, then put it back.
-- I ran the whole stack from a fresh clone with `docker compose up --build`.
