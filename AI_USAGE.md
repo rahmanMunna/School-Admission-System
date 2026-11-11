@@ -8,7 +8,7 @@
 |---|---|---|
 | Design decisions | Discussed options when I was unsure: row lock vs C# lock vs SERIALIZABLE, background service vs scheduler, polling vs WebSockets | Chose the approach and wrote the assumptions |
 | Backend code | Generated the initial code for each layer |  Modified every layer: rewrote services, repositories and controllers and replaced a header-helper class with `[FromHeader]`, changed `ClassSeatCounts` to a class, fixed the EF query; tested every endpoint manually (class full, duplicate apply, pay twice, wrong student, cancel, expiry) |
-| Frontend pages | First drafts of page structure and styling | Tested every flow in the browser, simplified config (removed extra config files) |
+| Frontend pages | First drafts of page structure and styling the pages | Tested every flow in the browser, simplified config (removed extra config files) |
 | Automated tests | First drafts of backend (xUnit) and frontend (Vitest) tests | Ran them, found and fixed the failures below |
 | Docker | First drafts of Dockerfiles and compose | Fixed local port conflict (8080 taken) with `API_PORT`, kept 8080 as default |
 
